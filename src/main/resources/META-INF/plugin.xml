@@ -37,7 +37,7 @@
                 parentId="appearance"
                 instance="com.kody.backgroundimageplus.config.BackgroundImageConfigurable"
                 id="com.kody.backgroundimageplus.config.BackgroundImageConfigurable"
-                key="config.backgroundimage.title"/>
+                key="config.background.title"/>
         <applicationService
                 serviceImplementation="com.kody.backgroundimageplus.config.BackgroundImageSettings"/>
         <postStartupActivity implementation="com.kody.backgroundimageplus.listener.StartupActivity"/>

@@ -22,14 +22,14 @@ class BackgroundImageConfigurable : Configurable {
     private val settings = BackgroundImageSettings.getInstance()
     private val backgroundImageManager = BackgroundImageManager.getInstance()
 
-    override fun getDisplayName(): String = MyMessageBundle.message("config.backgroundimage.title")
+    override fun getDisplayName(): String = MyMessageBundle.message("config.background.title")
 
     override fun getHelpTopic(): String? = null
 
     override fun createComponent(): JComponent {
         folderPathField = JBTextField()
         folderPathField?.isEditable = false
-        folderBrowseButton = JButton(MyMessageBundle.message("config.backgroundimage.browse.folder"))
+        folderBrowseButton = JButton(MyMessageBundle.message("config.background.browse.folder"))
 
         // 使用计步器替代滑块
         opacitySpinner = JSpinner(SpinnerNumberModel(settings.opacity, 0, 100, 1))
@@ -39,8 +39,8 @@ class BackgroundImageConfigurable : Configurable {
         folderBrowseButton!!.addActionListener {
             SwingUtilities.invokeLater {
                 val descriptor = FileChooserDescriptor(false, true, false, false, false, false)
-                    .withTitle(MyMessageBundle.message("config.backgroundimage.select.folder"))
-                    .withDescription(MyMessageBundle.message("config.backgroundimage.folder.path"))
+                    .withTitle(MyMessageBundle.message("config.background.select.folder"))
+                    .withDescription(MyMessageBundle.message("config.background.folder.path"))
 
                 val dialog = FileChooserFactory.getInstance().createFileChooser(descriptor, null, null)
                 val files: Array<VirtualFile> = dialog.choose(null)
@@ -59,14 +59,14 @@ class BackgroundImageConfigurable : Configurable {
         }
 
         panel = FormBuilder.createFormBuilder()
-            .addLabeledComponent(JBLabel(MyMessageBundle.message("config.backgroundimage.folder.path")), folderPanel, 1)
+            .addLabeledComponent(JBLabel(MyMessageBundle.message("config.background.folder.path")), folderPanel, 1)
             .addLabeledComponent(
-                JBLabel(MyMessageBundle.message("config.backgroundimage.switch.interval")),
+                JBLabel(MyMessageBundle.message("config.background.switch.interval")),
                 intervalSpinner!!,
                 1
             )
             .addLabeledComponent(
-                JBLabel(MyMessageBundle.message("config.backgroundimage.opacity")),
+                JBLabel(MyMessageBundle.message("config.background.opacity")),
                 opacitySpinner!!,
                 1
             )
