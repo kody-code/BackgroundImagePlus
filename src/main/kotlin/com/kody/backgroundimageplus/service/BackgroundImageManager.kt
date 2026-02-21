@@ -41,7 +41,10 @@ class BackgroundImageManager {
                 "$imagePath,$opacity,${IdeBackgroundUtil.Fill.PLAIN.name},${IdeBackgroundUtil.Anchor.CENTER.name}"
 
             props.setValue(IdeBackgroundUtil.EDITOR_PROP, spec)
-            IdeBackgroundUtil.resetBackgroundImagePainters()
+
+            ApplicationManager.getApplication().invokeLater {
+                IdeBackgroundUtil.resetBackgroundImagePainters()
+            }
 
         } catch (e: Exception) {
             e.printStackTrace()
