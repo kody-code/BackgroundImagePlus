@@ -4,104 +4,105 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.FormBuilder
-import com.kody.backgroundimageplus.BackgroundImageManager
-import javax.swing.JButton
-import javax.swing.JComponent
-import javax.swing.JPanel
-import javax.swing.JSlider
-import javax.swing.SwingUtilities
+import com.kody.backgroundimageplus.MyMessageBundle
+import com.kody.backgroundimageplus.service.BackgroundImageManager
+import javax.swing.*
 
 class BackgroundImageConfigurable : Configurable {
-    
+
     private var panel: JPanel? = null
-    private var enabledCheckBox: JBCheckBox? = null
-    private var imagePathField: JBTextField? = null
-    private var opacitySlider: JSlider? = null
-    private var browseButton: JButton? = null
-    
+    private var folderPathField: JBTextField? = null
+    private var folderBrowseButton: JButton? = null
+    private var opacitySpinner: JSpinner? = null
+    private var intervalSpinner: JSpinner? = null
+
     private val settings = BackgroundImageSettings.getInstance()
     private val backgroundImageManager = BackgroundImageManager.getInstance()
-    
-    override fun getDisplayName(): String = "Background Image Plus"
-    
+
+    override fun getDisplayName(): String = MyMessageBundle.message("config.backgroundimage.title")
+
     override fun getHelpTopic(): String? = null
-    
+
     override fun createComponent(): JComponent {
-        enabledCheckBox = JBCheckBox("启用背景图片")
-        imagePathField = JBTextField()
-        imagePathField?.isEditable = false
-        opacitySlider = JSlider(0, 100, settings.opacity) // 使用设置中的当前值
-        browseButton = JButton("浏览...")
-        
-        browseButton!!.addActionListener {
-            // 在后台线程中执行文件选择操作
+        folderPathField = JBTextField()
+        folderPathField?.isEditable = false
+        folderBrowseButton = JButton(MyMessageBundle.message("config.backgroundimage.browse.folder"))
+
+        // 使用计步器替代滑块
+        opacitySpinner = JSpinner(SpinnerNumberModel(settings.opacity, 0, 100, 1))
+        intervalSpinner = JSpinner(SpinnerNumberModel(settings.switchInterval, 1, 60, 1))
+
+        // 文件夹浏览按钮事件
+        folderBrowseButton!!.addActionListener {
             SwingUtilities.invokeLater {
-                val descriptor = FileChooserDescriptor(true, false, false, false, false, false)
-                    .withTitle("选择背景图片")
-                    .withDescription("请选择要作为背景的图片文件")
-                
-                descriptor.withFileFilter { file ->
-                    val extension = file.extension?.lowercase()
-                    extension == "png" || extension == "jpg" || extension == "jpeg"
-                }
-                
+                val descriptor = FileChooserDescriptor(false, true, false, false, false, false)
+                    .withTitle(MyMessageBundle.message("config.backgroundimage.select.folder"))
+                    .withDescription(MyMessageBundle.message("config.backgroundimage.folder.path"))
+
                 val dialog = FileChooserFactory.getInstance().createFileChooser(descriptor, null, null)
                 val files: Array<VirtualFile> = dialog.choose(null)
                 if (files.isNotEmpty()) {
-                    // 在 EDT 上更新 UI
                     SwingUtilities.invokeLater {
-                        imagePathField?.text = files[0].presentableUrl
+                        folderPathField?.text = files[0].presentableUrl
                     }
                 }
             }
         }
-        
-        val filePanel = JPanel().apply {
+
+        val folderPanel = JPanel().apply {
             layout = java.awt.BorderLayout()
-            add(imagePathField!!, java.awt.BorderLayout.CENTER)
-            add(browseButton!!, java.awt.BorderLayout.EAST)
+            add(folderPathField!!, java.awt.BorderLayout.CENTER)
+            add(folderBrowseButton!!, java.awt.BorderLayout.EAST)
         }
-        
+
         panel = FormBuilder.createFormBuilder()
-            .addLabeledComponent(JBLabel("启用设置："), enabledCheckBox!!, 1)
-            .addLabeledComponent(JBLabel("图片路径："), filePanel, 1)
-            .addLabeledComponent(JBLabel("透明度："), opacitySlider!!, 1)
+            .addLabeledComponent(JBLabel(MyMessageBundle.message("config.backgroundimage.folder.path")), folderPanel, 1)
+            .addLabeledComponent(
+                JBLabel(MyMessageBundle.message("config.backgroundimage.switch.interval")),
+                intervalSpinner!!,
+                1
+            )
+            .addLabeledComponent(
+                JBLabel(MyMessageBundle.message("config.backgroundimage.opacity")),
+                opacitySpinner!!,
+                1
+            )
             .addComponentFillVertically(JPanel(), 0)
             .panel
-        
+
         return panel!!
     }
-    
+
     override fun isModified(): Boolean {
-        return enabledCheckBox?.isSelected != settings.isEnabled ||
-               imagePathField?.text != settings.imagePath ||
-               opacitySlider?.value != settings.opacity
+        return folderPathField?.text != settings.folderPath ||
+                (opacitySpinner?.value as Int) != settings.opacity ||
+                (intervalSpinner?.value as Int) != settings.switchInterval
     }
-    
+
     override fun apply() {
-        settings.isEnabled = enabledCheckBox?.isSelected ?: false
-        settings.imagePath = imagePathField?.text ?: ""
-        settings.opacity = opacitySlider?.value ?: 30
-        
+        settings.folderPath = folderPathField?.text ?: ""
+        settings.opacity = opacitySpinner?.value as Int
+        settings.switchInterval = intervalSpinner?.value as Int
+
         // 应用背景图片设置
         backgroundImageManager.updateBackgroundImage()
     }
-    
+
     override fun reset() {
-        enabledCheckBox?.isSelected = settings.isEnabled
-        imagePathField?.text = settings.imagePath
-        opacitySlider?.value = settings.opacity
+        folderPathField?.text = settings.folderPath
+        opacitySpinner?.value = settings.opacity
+        intervalSpinner?.value = settings.switchInterval
     }
-    
+
     override fun disposeUIResources() {
         panel = null
-        enabledCheckBox = null
-        imagePathField = null
-        opacitySlider = null
-        browseButton = null
+        folderPathField = null
+        folderBrowseButton = null
+        opacitySpinner = null
+        intervalSpinner = null
     }
 }
+

@@ -4,43 +4,24 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.util.xmlb.XmlSerializerUtil
 
 @State(
-    name = "BackgroundImagePlusSettings",
-    storages = [Storage("background-image-plus.xml")]
+    name = "BackgroundImageSettings",
+    storages = [Storage("backgroundImagePlus.xml")]
 )
-class BackgroundImageSettings : PersistentStateComponent<BackgroundImageSettings.State> {
+class BackgroundImageSettings : PersistentStateComponent<BackgroundImageSettings> {
 
-    private var myState = State()
+    var opacity: Int = 30
 
-    override fun getState(): State = myState
+    // 新增自动切换相关设置
+    var folderPath: String = ""
+    var switchInterval: Int = 5 // 分钟
 
-    override fun loadState(state: State) {
-        myState = state
-    }
+    override fun getState(): BackgroundImageSettings = this
 
-    var isEnabled: Boolean
-        get() = myState.enabled
-        set(value) {
-            myState.enabled = value
-        }
-
-    var imagePath: String
-        get() = myState.imagePath
-        set(value) {
-            myState.imagePath = value
-        }
-
-    var opacity: Int
-        get() = myState.opacity
-        set(value) {
-            myState.opacity = value
-        }
-
-    class State {
-        var enabled: Boolean = false
-        var imagePath: String = ""
-        var opacity: Int = 10  // 统一默认值为 30
+    override fun loadState(state: BackgroundImageSettings) {
+        XmlSerializerUtil.copyBean(state, this)
     }
 
     companion object {

@@ -30,14 +30,9 @@
                 parentId="appearance"
                 instance="com.kody.backgroundimageplus.config.BackgroundImageConfigurable"
                 id="com.kody.backgroundimageplus.config.BackgroundImageConfigurable"
-                displayName="Background Image Plus"/>
+                key="config.backgroundimage.title"/>
         <applicationService
                 serviceImplementation="com.kody.backgroundimageplus.config.BackgroundImageSettings"/>
+        <postStartupActivity implementation="com.kody.backgroundimageplus.listener.StartupActivity"/>
     </extensions>
-
-    <!-- 添加启动监听器 -->
-    <applicationListeners>
-        <listener class="com.kody.backgroundimageplus.StartupListener"
-                  topic="com.intellij.ide.AppLifecycleListener"/>
-    </applicationListeners>
 </idea-plugin>
