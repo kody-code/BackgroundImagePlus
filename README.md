@@ -1,117 +1,160 @@
-# IntelliJ Platform Plugin Template
+# BackgroundImagePlus - IntelliJ IDEA 背景图片插件
 
-[![Twitter Follow](https://img.shields.io/badge/follow-%40JBPlatform-1DA1F2?logo=twitter)](https://twitter.com/JBPlatform)
-[![Developers Forum](https://img.shields.io/badge/JetBrains%20Platform-Join-blue)][jb:forum]
+[![JetBrains Plugin](https://img.shields.io/badge/JetBrains-Marketplace-blue)](https://plugins.jetbrains.com)
+[![IntelliJ Platform](https://img.shields.io/badge/IntelliJ-Platform-orange)](https://plugins.jetbrains.com/docs/intellij)
 
-## Plugin template structure
+一个简单易用的IntelliJ IDEA背景图片插件，支持自动切换壁纸功能。
 
-A generated project contains the following content structure:
+## 功能特性
+
+- 🖼️ **自动壁纸切换** - 从指定文件夹自动循环切换背景图片
+- ⚙️ **简单配置** - 只需选择壁纸文件夹即可使用
+- 🎛️ **灵活调节** - 支持透明度和切换间隔的精确调节
+- 🌍 **多语言支持** - 支持中文和英文界面
+- 🔧 **开箱即用** - 安装后自动生效，无需复杂配置
+
+## 使用方法
+
+1. 安装插件后，在IDEA设置中找到 **外观与行为** → **背景图片增强版**
+2. 选择包含壁纸图片的文件夹
+3. 调整透明度（0-100）和切换间隔（1-60分钟）
+4. 点击应用，立即生效！
+
+## 项目结构
 
 ```
-.
-├── .run/                   Predefined Run/Debug Configurations
-├── build/                  Output build directory
-├── gradle
-│   ├── wrapper/            Gradle Wrapper
-├── src                     Plugin sources
-│   ├── main
-│   │   ├── kotlin/         Kotlin production sources
-│   │   └── resources/      Resources - plugin.xml, icons, messages
-├── .gitignore              Git ignoring rules
-├── build.gradle.kts        Gradle build configuration
-├── gradle.properties       Gradle configuration properties
-├── gradlew                 *nix Gradle Wrapper script
-├── gradlew.bat             Windows Gradle Wrapper script
-├── README.md               README
-└── settings.gradle.kts     Gradle project settings
+src/
+├── main/
+│   ├── kotlin/com/kody/backgroundimageplus/
+│   │   ├── config/
+│   │   │   ├── BackgroundImageConfigurable.kt    # 配置界面
+│   │   │   └── BackgroundImageSettings.kt        # 设置存储
+│   │   ├── listener/
+│   │   │   └── StartupActivity.kt                # 启动监听器
+│   │   ├── service/
+│   │   │   └── BackgroundImageManager.kt         # 核心服务
+│   │   └── MyMessageBundle.kt                    # 多语言支持
+│   └── resources/
+│       ├── META-INF/
+│       │   └── plugin.xml                        # 插件配置
+│       └── messages/
+│           ├── MyMessageBundle.properties        # 英文资源
+│           └── MyMessageBundle_zh.properties     # 中文资源
 ```
 
-In addition to the configuration files, the most crucial part is the `src` directory, which contains our implementation
-and the manifest for our plugin – [plugin.xml][file:plugin.xml].
+## 核心组件
 
-> [!NOTE]
-> To use Java in your plugin, create the `/src/main/java` directory.
+### BackgroundImageManager
+核心背景图片管理服务，负责：
+- 图片文件的加载和验证
+- 自动切换定时任务管理
+- IDE背景的设置和清除
 
-## Plugin configuration file
+### BackgroundImageSettings
+持久化设置管理，存储：
+- 壁纸文件夹路径
+- 透明度设置
+- 切换间隔配置
 
-The plugin configuration file is a [plugin.xml][file:plugin.xml] file located in the `src/main/resources/META-INF`
-directory.
-It provides general information about the plugin, its dependencies, extensions, and listeners.
+### BackgroundImageConfigurable
+用户配置界面，提供：
+- 文件夹选择功能
+- 透明度和间隔调节控件
+- 实时预览和应用功能
 
-You can read more about this file in the [Plugin Configuration File][docs:plugin.xml] section of our documentation.
+### StartupActivity
+启动监听器，在IDE启动时：
+- 自动加载保存的设置
+- 立即应用背景图片
+- 确保插件开箱即用
 
-If you're still not quite sure what this is all about, read our
-introduction: [What is the IntelliJ Platform?][docs:intro]
+## 构建和运行
 
-$H$H Predefined Run/Debug configurations
+### 环境要求
+- JDK 21+
+- IntelliJ IDEA 2025.2.4+
+- Gradle 9.0+
 
-Within the default project structure, there is a `.run` directory provided containing predefined *Run/Debug
-configurations* that expose corresponding Gradle tasks:
+### 开发命令
 
-| Configuration name | Description                                                                                                                                                                         |
-|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Run Plugin         | Runs [`:runIde`][gh:intellij-platform-gradle-plugin-runIde] IntelliJ Platform Gradle Plugin task. Use the *Debug* icon for plugin debugging.                                        |
-| Run Tests          | Runs [`:test`][gradle:lifecycle-tasks] Gradle task.                                                                                                                                 |
-| Run Verifications  | Runs [`:verifyPlugin`][gh:intellij-platform-gradle-plugin-verifyPlugin] IntelliJ Platform Gradle Plugin task to check the plugin compatibility against the specified IntelliJ IDEs. |
+```bash
+# 运行插件调试
+./gradlew runIde
 
-> [!NOTE]
-> You can find the logs from the running task in the `idea.log` tab.
+# 构建插件
+./gradlew buildPlugin
 
-## Publishing the plugin
+# 验证插件兼容性
+./gradlew verifyPlugin
 
-> [!TIP]
-> Make sure to follow all guidelines listed in [Publishing a Plugin][docs:publishing] to follow all recommended and
-> required steps.
+# 运行测试
+./gradlew test
+```
 
-Releasing a plugin to [JetBrains Marketplace](https://plugins.jetbrains.com) is a straightforward operation that uses
-the `publishPlugin` Gradle task provided by
-the [intellij-platform-gradle-plugin][gh:intellij-platform-gradle-plugin-docs].
+### 项目配置
 
-You can also upload the plugin to the [JetBrains Plugin Repository](https://plugins.jetbrains.com/plugin/upload)
-manually via UI.
+项目使用Gradle Kotlin DSL构建，主要配置文件：
+- `build.gradle.kts` - 构建配置
+- `settings.gradle.kts` - 项目设置
+- `gradle.properties` - Gradle属性
 
-## Useful links
+## 插件配置
 
-- [IntelliJ Platform SDK Plugin SDK][docs]
-- [IntelliJ Platform Gradle Plugin Documentation][gh:intellij-platform-gradle-plugin-docs]
-- [IntelliJ Platform Explorer][jb:ipe]
-- [JetBrains Marketplace Quality Guidelines][jb:quality-guidelines]
-- [IntelliJ Platform UI Guidelines][jb:ui-guidelines]
-- [JetBrains Marketplace Paid Plugins][jb:paid-plugins]
-- [IntelliJ SDK Code Samples][gh:code-samples]
+插件配置文件位于 `src/main/resources/META-INF/plugin.xml`，定义了：
+- 插件基本信息（ID、名称、作者）
+- 依赖模块声明
+- 扩展点注册（配置界面、服务、启动监听器）
+- 多语言资源绑定
+
+## 支持的图片格式
+
+插件支持以下常见图片格式：
+- PNG (.png)
+- JPEG (.jpg, .jpeg)
+
+## 多语言支持
+
+插件内置中英文双语支持：
+- 系统语言为中文时自动显示中文界面
+- 其他情况显示英文界面
+
+资源文件位置：
+- `src/main/resources/messages/MyMessageBundle.properties` (英文)
+- `src/main/resources/messages/MyMessageBundle_zh.properties` (中文)
+
+## 发布插件
+
+准备发布到JetBrains Marketplace：
+
+```bash
+# 发布插件
+./gradlew publishPlugin
+```
+
+发布前请确保：
+1. 更新版本号
+2. 完善插件描述
+3. 测试所有功能
+4. 遵循[质量指南][jb:quality-guidelines]
+
+## 开发资源
+
+- [IntelliJ Platform SDK 文档][docs]
+- [插件开发示例代码][gh:code-samples]
+- [插件配置文件说明][docs:plugin.xml]
+- [UI设计指南][jb:ui-guidelines]
+- [插件质量标准][jb:quality-guidelines]
+
+## 许可证
+
+本项目采用MIT许可证，详情请参见LICENSE文件。
+
+## 贡献
+
+欢迎提交Issue和Pull Request来改进这个插件！
 
 [docs]: https://plugins.jetbrains.com/docs/intellij
-
-[docs:intro]: https://plugins.jetbrains.com/docs/intellij/intellij-platform.html?from=IJPluginTemplate
-
-[docs:plugin.xml]: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html?from=IJPluginTemplate
-
-[docs:publishing]: https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate
-
-[file:plugin.xml]: ./src/main/resources/META-INF/plugin.xml
-
+[docs:plugin.xml]: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html
 [gh:code-samples]: https://github.com/JetBrains/intellij-sdk-code-samples
-
-[gh:intellij-platform-gradle-plugin]: https://github.com/JetBrains/intellij-platform-gradle-plugin
-
-[gh:intellij-platform-gradle-plugin-docs]: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
-
-[gh:intellij-platform-gradle-plugin-runIde]: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-tasks.html#runIde
-
-[gh:intellij-platform-gradle-plugin-verifyPlugin]: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-tasks.html#verifyPlugin
-
-[gradle:lifecycle-tasks]: https://docs.gradle.org/current/userguide/java_plugin.html#lifecycle_tasks
-
-[jb:github]: https://github.com/JetBrains/.github/blob/main/profile/README.md
-
-[jb:forum]: https://platform.jetbrains.com/
-
-[jb:quality-guidelines]: https://plugins.jetbrains.com/docs/marketplace/quality-guidelines.html
-
-[jb:paid-plugins]: https://plugins.jetbrains.com/docs/marketplace/paid-plugins-marketplace.html
-
-[jb:quality-guidelines]: https://plugins.jetbrains.com/docs/marketplace/quality-guidelines.html
-
-[jb:ipe]: https://jb.gg/ipe
-
 [jb:ui-guidelines]: https://jetbrains.github.io/ui
+[jb:quality-guidelines]: https://plugins.jetbrains.com/docs/marketplace/quality-guidelines.html

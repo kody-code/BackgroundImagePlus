@@ -13,8 +13,15 @@
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
-        Enter short description for your plugin here.<br>
-        <em>most HTML tags may be used</em>
+        一个简单易用的IntelliJ IDEA背景图片插件。<br>
+        支持从指定文件夹自动循环切换壁纸，可调节透明度和切换间隔。<br>
+        <em>开箱即用，无需复杂配置！</em>
+        <ul>
+            <li>🖼️ 自动壁纸切换功能</li>
+            <li>⚙️ 简洁的配置界面</li>
+            <li>🎛️ 精确的透明度和间隔调节</li>
+            <li>🌍 中英文双语支持</li>
+        </ul>
     ]]></description>
 
     <!-- Product and plugin compatibility requirements.
