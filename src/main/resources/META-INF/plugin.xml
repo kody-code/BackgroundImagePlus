@@ -42,4 +42,18 @@
                 serviceImplementation="com.kody.backgroundimageplus.config.BackgroundImageSettings"/>
         <postStartupActivity implementation="com.kody.backgroundimageplus.listener.StartupActivity"/>
     </extensions>
+
+    <!-- Actions -->
+    <actions>
+        <group id="BackgroundImagePlus.Menu"
+               popup="true">
+            <add-to-group group-id="ViewMenu" anchor="last"/>
+            <action id="ToggleAutoSwitch"
+                    class="com.kody.backgroundimageplus.actions.ToggleAutoSwitchAction"/>
+            <action id="ShowNextImage"
+                    class="com.kody.backgroundimageplus.actions.ShowNextImageAction"/>
+            <action id="ClearBackground"
+                    class="com.kody.backgroundimageplus.actions.ClearBackgroundAction"/>
+        </group>
+    </actions>
 </idea-plugin>

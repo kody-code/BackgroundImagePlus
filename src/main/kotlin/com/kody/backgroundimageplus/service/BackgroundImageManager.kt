@@ -17,6 +17,7 @@ class BackgroundImageManager {
     private var scheduler: ScheduledExecutorService? = null
     private var currentImageIndex = 0
     private var imageFiles: List<File> = emptyList()
+    private var isPaused = false
 
     fun updateBackgroundImage() {
         stopAutoSwitch()
@@ -79,10 +80,12 @@ class BackgroundImageManager {
         // 立即显示第一张图片
         showCurrentImage()
 
-        // 定时切换
-        scheduler?.scheduleWithFixedDelay({
-            switchToNextImage()
-        }, settings.switchInterval.toLong(), settings.switchInterval.toLong(), TimeUnit.MINUTES)
+        // 定时切换（除非已暂停）
+        if (!isPaused) {
+            scheduler?.scheduleWithFixedDelay({
+                switchToNextImage()
+            }, settings.switchInterval.toLong(), settings.switchInterval.toLong(), TimeUnit.MINUTES)
+        }
     }
 
     private fun stopAutoSwitch() {
@@ -98,10 +101,40 @@ class BackgroundImageManager {
     }
 
     private fun switchToNextImage() {
+        if (imageFiles.isNotEmpty() && !isPaused) {
+            currentImageIndex = (currentImageIndex + 1) % imageFiles.size
+            showCurrentImage()
+        }
+    }
+
+    // 新增公共方法
+    fun pauseAutoSwitch() {
+        isPaused = true
+        stopAutoSwitch()
+    }
+
+    fun resumeAutoSwitch() {
+        isPaused = false
+        if (settings.folderPath.isNotEmpty()) {
+            startAutoSwitch()
+        }
+    }
+
+    fun isAutoSwitchPaused(): Boolean = isPaused
+
+    fun showNextImage() {
         if (imageFiles.isNotEmpty()) {
             currentImageIndex = (currentImageIndex + 1) % imageFiles.size
             showCurrentImage()
         }
+    }
+
+    fun clearBackground() {
+        stopAutoSwitch()
+        clearIdeBackground()
+        imageFiles = emptyList()
+        currentImageIndex = 0
+        isPaused = false
     }
 
     private fun isSupportedImageFile(file: File): Boolean {
