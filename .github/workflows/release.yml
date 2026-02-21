@@ -1,26 +1,18 @@
 name: Release
 on:
   release:
-    types: [prereleased, released]
+    types: [ prereleased, released ]
 
 jobs:
-  # GitHub Release相关处理
+  # 简化的发布流程 - 只做打包上传
   github-release:
-    name: GitHub Release Processing
+    name: Package and Upload
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     steps:
-      # 释放磁盘空间
-      - name: Maximize Build Space
-        uses: jlumbroso/free-disk-space@v1.3.1
-        with:
-          tool-cache: false
-          large-packages: false
-
       # 检出代码
-      - name: Fetch Sources
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.release.tag_name }}
@@ -35,23 +27,10 @@ jobs:
       # 设置Gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: true
 
       # 构建插件
       - name: Build Plugin
         run: ./gradlew buildPlugin
-
-      # 更新变更日志
-      - name: Patch Changelog
-        if: ${{ github.event.release.body != '' }}
-        env:
-          CHANGELOG: ${{ github.event.release.body }}
-        run: |
-          RELEASE_NOTE="./build/tmp/release_note.txt"
-          mkdir -p "$(dirname "$RELEASE_NOTE")"
-          echo "$CHANGELOG" > $RELEASE_NOTE
-          ./gradlew patchChangelog --release-note-file=$RELEASE_NOTE
 
       # 上传构建产物作为Release资产
       - name: Upload Release Assets
@@ -60,38 +39,3 @@ jobs:
         run: |
           # 上传插件分发文件
           gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
-          
-          # 上传构建报告（可选）
-          if [ -d "./build/reports" ]; then
-            gh release upload ${{ github.event.release.tag_name }} ./build/reports/**/* --clobber
-          fi
-
-      # 创建变更日志更新的PR
-      - name: Create Changelog PR
-        if: ${{ github.event.release.body != '' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          VERSION="${{ github.event.release.tag_name }}"
-          BRANCH="changelog-update-$VERSION"
-          LABEL="release changelog"
-
-          git config user.email "action@github.com"
-          git config user.name "GitHub Action"
-
-          git checkout -b $BRANCH
-          git commit -am "Changelog update - $VERSION"
-          git push --set-upstream origin $BRANCH
-          
-          # 创建标签（如果不存在）
-          gh label create "$LABEL" \
-            --description "Pull requests with release changelog update" \
-            --force \
-            || true
-
-          # 创建PR
-          gh pr create \
-            --title "Changelog update - \`$VERSION\`" \
-            --body "Current pull request contains patched \`CHANGELOG.md\` file for the \`$VERSION\` version." \
-            --label "$LABEL" \
-            --head $BRANCH
