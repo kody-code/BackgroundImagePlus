@@ -6,6 +6,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
 import com.kody.backgroundimageplus.config.BackgroundImageSettings
 import java.io.File
+import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -18,6 +19,7 @@ class BackgroundImageManager {
     private var currentImageIndex = 0
     private var imageFiles: List<File> = emptyList()
     private var isPaused = false
+    private val random = Random()
 
     fun updateBackgroundImage() {
         stopAutoSwitch()
@@ -105,7 +107,19 @@ class BackgroundImageManager {
 
     private fun switchToNextImage() {
         if (imageFiles.isNotEmpty() && !isPaused) {
-            currentImageIndex = (currentImageIndex + 1) % imageFiles.size
+            if (settings.isRandomMode) {
+                // 随机模式：随机选择一个不等于当前索引的位置
+                if (imageFiles.size > 1) {
+                    var newIndex: Int
+                    do {
+                        newIndex = random.nextInt(imageFiles.size)
+                    } while (newIndex == currentImageIndex)
+                    currentImageIndex = newIndex
+                }
+            } else {
+                // 顺序模式：按顺序切换
+                currentImageIndex = (currentImageIndex + 1) % imageFiles.size
+            }
             showCurrentImage()
         }
     }
@@ -128,6 +142,19 @@ class BackgroundImageManager {
     fun showNextImage() {
         if (imageFiles.isNotEmpty()) {
             currentImageIndex = (currentImageIndex + 1) % imageFiles.size
+            showCurrentImage()
+        }
+    }
+
+    fun showRandomImage() {
+        if (imageFiles.isNotEmpty()) {
+            if (imageFiles.size > 1) {
+                var newIndex: Int
+                do {
+                    newIndex = random.nextInt(imageFiles.size)
+                } while (newIndex == currentImageIndex)
+                currentImageIndex = newIndex
+            }
             showCurrentImage()
         }
     }

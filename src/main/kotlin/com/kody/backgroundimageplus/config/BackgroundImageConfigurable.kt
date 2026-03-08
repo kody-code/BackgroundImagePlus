@@ -18,6 +18,7 @@ class BackgroundImageConfigurable : Configurable {
     private var folderBrowseButton: JButton? = null
     private var opacitySpinner: JSpinner? = null
     private var intervalSpinner: JSpinner? = null
+    private var randomModeCheckBox: JCheckBox? = null
 
     private val settings = BackgroundImageSettings.getInstance()
     private val backgroundImageManager = BackgroundImageManager.getInstance()
@@ -34,6 +35,9 @@ class BackgroundImageConfigurable : Configurable {
         // 使用计步器替代滑块
         opacitySpinner = JSpinner(SpinnerNumberModel(settings.opacity, 0, 100, 1))
         intervalSpinner = JSpinner(SpinnerNumberModel(settings.switchInterval, 1, 60, 1))
+        randomModeCheckBox = JCheckBox(MyMessageBundle.message("config.background.random.mode")).apply {
+            isSelected = settings.isRandomMode
+        }
 
         // 文件夹浏览按钮事件
         folderBrowseButton!!.addActionListener {
@@ -60,6 +64,7 @@ class BackgroundImageConfigurable : Configurable {
 
         panel = FormBuilder.createFormBuilder()
             .addLabeledComponent(JBLabel(MyMessageBundle.message("config.background.folder.path")), folderPanel, 1)
+            .addComponent(randomModeCheckBox!!)
             .addLabeledComponent(
                 JBLabel(MyMessageBundle.message("config.background.switch.interval")),
                 intervalSpinner!!,
@@ -79,13 +84,15 @@ class BackgroundImageConfigurable : Configurable {
     override fun isModified(): Boolean {
         return folderPathField?.text != settings.folderPath ||
                 (opacitySpinner?.value as Int) != settings.opacity ||
-                (intervalSpinner?.value as Int) != settings.switchInterval
+                (intervalSpinner?.value as Int) != settings.switchInterval ||
+                randomModeCheckBox?.isSelected != settings.isRandomMode
     }
 
     override fun apply() {
         settings.folderPath = folderPathField?.text ?: ""
         settings.opacity = opacitySpinner?.value as Int
         settings.switchInterval = intervalSpinner?.value as Int
+        settings.isRandomMode = randomModeCheckBox?.isSelected ?: false
 
         // 应用背景图片设置
         backgroundImageManager.updateBackgroundImage()
@@ -95,6 +102,7 @@ class BackgroundImageConfigurable : Configurable {
         folderPathField?.text = settings.folderPath
         opacitySpinner?.value = settings.opacity
         intervalSpinner?.value = settings.switchInterval
+        randomModeCheckBox?.isSelected = settings.isRandomMode
     }
 
     override fun disposeUIResources() {
@@ -103,6 +111,7 @@ class BackgroundImageConfigurable : Configurable {
         folderBrowseButton = null
         opacitySpinner = null
         intervalSpinner = null
+        randomModeCheckBox = null
     }
 }
 

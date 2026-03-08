@@ -17,6 +17,7 @@ class BackgroundImageSettings : PersistentStateComponent<BackgroundImageSettings
     // 新增自动切换相关设置
     var folderPath: String = ""
     var switchInterval: Int = 5 // 分钟
+    var isRandomMode: Boolean = false
 
     override fun getState(): BackgroundImageSettings = this
 

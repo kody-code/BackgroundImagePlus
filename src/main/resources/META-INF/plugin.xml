@@ -54,6 +54,8 @@
                     class="com.kody.backgroundimageplus.actions.ShowNextImageAction"/>
             <action id="ClearBackground"
                     class="com.kody.backgroundimageplus.actions.ClearBackgroundAction"/>
+            <action id="Random"
+                    class="com.kody.backgroundimageplus.actions.ShowRandomImageAction"/>
         </group>
     </actions>
 </idea-plugin>
